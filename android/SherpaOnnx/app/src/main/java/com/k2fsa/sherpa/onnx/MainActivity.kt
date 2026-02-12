@@ -1,6 +1,9 @@
 package com.k2fsa.sherpa.onnx
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -10,6 +13,7 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import java.io.File
@@ -30,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recognizer: OnlineRecognizer
     private var audioRecord: AudioRecord? = null
     private lateinit var recordButton: Button
+    private lateinit var copyButton: Button
     private lateinit var textView: TextView
     private var recordingThread: Thread? = null
 
@@ -78,8 +83,25 @@ class MainActivity : AppCompatActivity() {
         recordButton = findViewById(R.id.record_button)
         recordButton.setOnClickListener { onclick() }
 
+        copyButton = findViewById(R.id.copy_button)
+        copyButton.setOnClickListener { copyToClipboard() }
+
         textView = findViewById(R.id.my_text)
         textView.movementMethod = ScrollingMovementMethod()
+        textView.setTextIsSelectable(true)
+    }
+
+    private fun copyToClipboard() {
+        val text = textView.text.toString()
+        if (text.isBlank() || text == getString(R.string.hint)) {
+            Toast.makeText(this, "没有可复制的内容", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("识别文字", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "已复制到剪贴板", Toast.LENGTH_SHORT).show()
     }
 
     private fun onclick() {
