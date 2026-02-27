@@ -98,8 +98,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        var processedText = text.replace("(\n)?\d+:\s*".toRegex(), "，")
+        processedText = processedText.trimStart('，', ' ')
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("识别文字", text)
+        val clip = ClipData.newPlainText("识别文字", processedText)
+
         clipboard.setPrimaryClip(clip)
         Toast.makeText(this, "已复制到剪贴板", Toast.LENGTH_SHORT).show()
     }
